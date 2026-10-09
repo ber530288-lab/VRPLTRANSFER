@@ -123,3 +123,35 @@ Fix: set `DB_PATH` to one fixed location in your variables, or run `/restore` wi
 - **Signing raises value:** a free agent who signs for a team gains `SIGN_VALUE_BONUS` ($500k by default). A transfer sets value to the price paid.
 - **/freeagents** lists EVERY member without a club (not just released players), 20 per page with ◀ ▶ buttons, with an optional `role` filter.
 - **/table** is faster: logos are stored copies (no downloads), fonts are cached, and an unchanged table is reused instantly.
+
+## Manager dashboard (`/dashboard`)
+Managers (and staff) run `/dashboard` and get a private control panel for their team (only they see it). Pick a section from the menu:
+- **Overview**: league position, record, form, budget, squad value, next match, last result, top performers, pending offers.
+- **Squad**: every player with value, goals, assists and clean sheets.
+- **Fixtures**: next 5 games and last 5 results.
+- **Transfers & budget**: spent, received, who you bought and sold.
+- **Offers**: offers waiting for a player's answer (cancel one from the menu) and recent answers.
+- **Scouting**: opponent analysis of your next opponent, or any team you choose: record, form, attack/defence ranking, best players, danger man, head to head and a game plan.
+Buttons: **Sign**, **Transfer** (asks for the fee), **Loan**, **Refresh**, and **Release** (staff only). They use the same rules as the slash commands.
+Managers only see their own team; staff can open any team with `/dashboard team:...`.
+
+## If a transfer announcement doesn't appear
+The bot needs **View Channel, Send Messages, Embed Links and Attach Files** in the transactions channel. Check with `/health`,
+or run `/herewego_preview ... post:True` to post a test. The bot now always posts something: if Discord refuses the image it posts the text
+version, and the staff member who made the offer gets a DM saying what went wrong. If no transactions channel is set it posts where the offer was made.
+
+## Why data could be lost on update, and the automatic protection
+All teams, signings, budgets, fixtures and results live in ONE file: `pitchx.db`. The bot's code never deletes it. It only disappears
+if the host replaces/wipes the folder, reinstalls, or the bot is started from a new folder (a new empty file is created).
+Protection that now runs by itself:
+1. **Off-host copy in Discord:** at every start and every 6 hours the bot posts `pitchx.db` into a private channel `#pitchx-backups`
+   (it creates it, hidden from @everyone, if it has Manage Channels; otherwise make that channel yourself, or set `BACKUP_CHANNEL_ID`). The newest 30 are kept.
+2. **Automatic restore:** if the bot ever starts with an EMPTY database, it downloads the newest backup from that channel and restores it, then DMs the server owner.
+3. If it starts empty and finds nothing to restore, it DMs the owner exactly why (and the file path), instead of failing silently.
+4. `/health` shows the data file path, when it last changed, and when the last off-host backup was posted. The console prints how many teams were loaded at start.
+5. Local copies in the `backups` folder, `/backup` and `/restore` still work too.
+To check right now: run `/health` and confirm it shows an off-host backup.
+
+## Images
+Text drawn onto images (Here we go, banners, tables, trophy shelf) now uses only plain characters ("-", "...", "x"), so you never see a square box,
+whatever fonts your host has. Anything the font can't draw is removed automatically.
